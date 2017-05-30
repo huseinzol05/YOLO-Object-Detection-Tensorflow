@@ -15,16 +15,16 @@ flipped = True
 
 memory_duringtraining = 0.8
 memory_duringtesting = 0.8
-learning_rate = 0.001
+learning_rate = 0.0001
 dropout = 0.5
 batch_size = 3
-epoch = 15000
-checkpoint = 10
+epoch = 1000
+checkpoint = 1000
 
 # For main
 threshold = 0.2
 IOU_threshold = 0.5
-test_percentage = 0.05
+test_percentage = 0.99
 
 # 1 for read a picture
 # 2 to read from testing dataset

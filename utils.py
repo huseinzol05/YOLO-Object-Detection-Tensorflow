@@ -9,34 +9,14 @@ import settings
 class VOC:
     def __init__(self, phase):
         self.data_path = os.path.join('VOCdevkit', 'VOC2012')
-        self.batch_size = settings.batch_size
         self.image_size = settings.image_size
         self.cell_size = settings.cell_size
         self.classes = settings.classes_name
         self.class_to_ind = settings.classes_dict
         self.flipped = settings.flipped
         self.phase = phase
-        self.cursor = 0
-        self.epoch = 1
         self.gt_labels = None
         self.prepare()
-
-    def get(self):
-        images = np.zeros((self.batch_size, self.image_size, self.image_size, 3))
-        labels = np.zeros((self.batch_size, self.cell_size, self.cell_size, 25))
-        count = 0
-        while count < self.batch_size:
-            imname = self.gt_labels[self.cursor]['imname']
-            flipped = self.gt_labels[self.cursor]['flipped']
-            images[count, :, :, :] = self.image_read(imname, flipped)
-            labels[count, :, :, :] = self.gt_labels[self.cursor]['label']
-            count += 1
-            self.cursor += 1
-            if self.cursor >= len(self.gt_labels):
-                np.random.shuffle(self.gt_labels)
-                self.cursor = 0
-                self.epoch += 1
-        return images, labels
 
     def image_read(self, imname, flipped = False):
         image = cv2.imread(imname)
@@ -76,16 +56,17 @@ class VOC:
         print('Processing gt_labels from: ' + self.data_path)
 
         self.image_index = os.listdir(os.path.join('VOCdevkit', 'VOC2012', 'JPEGImages'))
+        
         self.image_index = [i.replace('.jpg', '') for i in self.image_index]
         
         import random
         random.shuffle(self.image_index)
         
         if self.phase == 'train':
-            val = int(len(self.image_index) * ((1 - settings.test_percentage) / 100.0))
+            val = int(len(self.image_index) * (1 - settings.test_percentage))
             self.image_index = self.image_index[: val]
         else:
-            val = int(len(self.image_index) * ((settings.test_percentage) / 100.0))
+            val = int(len(self.image_index) * settings.test_percentage)
             self.image_index = self.image_index[: val]
 
         gt_labels = []

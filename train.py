@@ -4,6 +4,7 @@ from utils import VOC
 import os
 import time
 import tensorflow as tf
+import numpy as np
 
 config = tf.ConfigProto()
 config.gpu_options.allocator_type = 'BFC'
@@ -27,12 +28,28 @@ except:
 for i in xrange(settings.epoch):
         
     last_time = time.time()
-    images, labels = utils.get()
+    total_loss = 0
+    
+    print len(utils.gt_labels)
+    
+    for x in xrange(0, len(utils.gt_labels) - settings.batch_size, settings.batch_size):
+        images = np.zeros((settings.batch_size, settings.image_size, settings.image_size, 3))
+        labels = np.zeros((settings.batch_size, settings.cell_size, settings.cell_size, 25))
         
-    loss, _ = sess.run([model.total_loss, model.optimizer], feed_dict = {model.images: images, model.labels: labels})
-        
-    if (i + 1) % settings.checkpoint == 0:
-        print 'epoch: ' + str(i + 1) + ', loss: ' + str(loss) + ',  s / epoch: ' + str(time.time() - last_time)
-        saver.save(sess, os.getcwd() + '/model.ckpt')
+        for n in xrange(settings.batch_size):
+            imname = utils.gt_labels[x + n]['imname']
+            flipped = utils.gt_labels[x + n]['flipped']
+            images[n, :, :, :] = utils.image_read(imname, flipped)
+            labels[n, :, :, :] = utils.gt_labels[x + n]['label']
+            
+        loss, _ = sess.run([model.total_loss, model.optimizer], feed_dict = {model.images: images, model.labels: labels})
+        total_loss += loss
+
+        if (x + 1) % settings.checkpoint == 0:
+            print 'checkpoint reached: ' + str(x + 1)
+    
+    np.random.shuffle(utils.gt_labels)
+    print 'epoch: ' + str(i + 1) + ', loss: ' + str(loss / (len(utils.gt_labels) - settings.batch_size / (settings.batch_size * 1.0))) + ',  s / epoch: ' + str(time.time() - last_time)
+    saver.save(sess, os.getcwd() + '/model.ckpt')
         
     
