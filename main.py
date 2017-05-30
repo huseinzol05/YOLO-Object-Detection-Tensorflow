@@ -5,6 +5,8 @@ import os
 import time
 import cv2
 import matplotlib.pyplot as plt
+import tensorflow as tf
+import numpy as np
 
 config = tf.ConfigProto()
 config.gpu_options.allocator_type = 'BFC'
@@ -44,7 +46,7 @@ def detect(img):
     inputs = (inputs / 255.0) * 2.0 - 1.0
     inputs = np.reshape(inputs, (1, settings.image_size, settings.image_size, 3))
 
-    result = settings.detect_from_cvmat(inputs)[0]
+    result = detect_from_cvmat(inputs)[0]
 
     for i in range(len(result)):
         result[i][1] *= (1.0 * img_w / settings.image_size)
@@ -54,8 +56,8 @@ def detect(img):
 
     return result
 
-def detect_from_cvmat(self, inputs):
-    net_output = settings.sess.run(model.logits, feed_dict = {model.images: inputs})
+def detect_from_cvmat(inputs):
+    net_output = sess.run(model.logits, feed_dict = {model.images: inputs})
     results = []
     for i in range(net_output.shape[0]):
         results.append(interpret_output(net_output[i]))
@@ -74,7 +76,7 @@ def iou(box1, box2):
 def interpret_output(output):
     probs = np.zeros((settings.cell_size, settings.cell_size, settings.box_per_cell, len(settings.classes_name)))
     class_probs = np.reshape(output[0 : boundary1], (settings.cell_size, settings.cell_size, settings.num_class))
-    scales = np.reshape(output[boundary1 : boundary2], (settings.cell_size, settings.cell_size, settings.boxes_per_cell))
+    scales = np.reshape(output[boundary1 : boundary2], (settings.cell_size, settings.cell_size, settings.box_per_cell))
     boxes = np.reshape(output[boundary2 :], (settings.cell_size, settings.cell_size, settings.box_per_cell, 4))
     offset = np.transpose(np.reshape(np.array([np.arange(settings.cell_size)] * settings.cell_size * settings.box_per_cell), [settings.box_per_cell, settings.cell_size, settings.cell_size]), (1, 2, 0))
 
@@ -85,7 +87,7 @@ def interpret_output(output):
 
     boxes *= settings.image_size
 
-    for i in range(settings.boxes_per_cell):
+    for i in range(settings.box_per_cell):
         for j in range(settings.num_class):
             probs[:, :, i, j] = np.multiply(class_probs[:, :, j], scales[:, :, i])
 
@@ -118,22 +120,24 @@ def interpret_output(output):
 
     return result
 
-def read_image(image):
+def read_image(image, name):
     result = detect(image)
     draw_result(image, result)
     plt.imshow(image)
-    plt.savefig(image[:-4] + 'output.png')
+    plt.savefig(os.getcwd() + '/' + name + 'output.png')
 
-if output == 1:
+if settings.output == 1:
     image = cv2.imread(settings.picture_name)
-    read_image(image)
+    read_image(image, settings.picture_name[-10:])
     
-if output == 2:
+if settings.output == 2:
     labels = VOC('test').load_labels()
-    for i in xrange(labels):
-        read_image(labels[i]['imname'])
+    for i in xrange(len(labels)):
+        print labels[i]['imname']
+        image = cv2.imread(labels[i]['imname'])
+        read_image(image, labels[i]['imname'][-10:])
 
-if output == 3:
+if settings.output == 3:
     cap = cv2.VideoCapture(-1)
     ret, _ = cap.read()
     while ret:

@@ -1,6 +1,7 @@
 classes_name =  ["aeroplane", "bicycle", "bird", "boat", "bottle", "bus", "car", "cat", "chair", "cow", "diningtable", "dog", "horse", "motorbike", "person", "pottedplant", "sheep", "sofa", "train", "tvmonitor"]
 classes_no = [i for i in xrange(len(classes_name))]
 classes_dict = dict(zip(classes_name, classes_no))
+num_class = len(classes_name)
 
 image_size = 448
 cell_size = 7
@@ -28,7 +29,7 @@ test_percentage = 0.05
 # 1 for read a picture
 # 2 to read from testing dataset
 # 3 to read from webcam / video
-output = 1
+output = 2
 # let empty if want to capture from webcam
 picture_name = ''
 video_name = ''
