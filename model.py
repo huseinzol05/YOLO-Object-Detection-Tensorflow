@@ -1,17 +1,20 @@
 import tensorflow as tf
 import settings
+import numpy as np
+
+slim = tf.contrib.slim
 
 class Model:
     
-    def __init(self, training = True):
+    def __init__(self, training = True):
         self.classes = settings.classes_name
         self.num_classes = len(settings.classes_name)
         self.image_size = settings.image_size
         self.cell_size = settings.cell_size
         self.boxes_per_cell = settings.box_per_cell
-        self.output_size = (self.cell_size * self.cell_size) * (self.num_class + self.boxes_per_cell * 5)
+        self.output_size = (self.cell_size * self.cell_size) * (self.num_classes + self.boxes_per_cell * 5)
         self.scale = 1.0 * self.image_size / self.cell_size
-        self.boundary1 = self.cell_size * self.cell_size * self.num_class
+        self.boundary1 = self.cell_size * self.cell_size * self.num_classes
         self.boundary2 = self.boundary1 + self.cell_size * self.cell_size * self.boxes_per_cell
 
         self.object_scale = settings.object_scale
@@ -23,13 +26,13 @@ class Model:
 
         self.images = tf.placeholder(tf.float32, [None, settings.image_size, settings.image_size, 3])
         
-        self.logits = self.build_network(self.images, num_outputs = self.output_size, alpha = self.alpha, training = training)
+        self.logits = self.build_network(self.images, num_outputs = self.output_size, alpha = settings.alpha_relu, training = training)
         
         if training:
-            self.labels = tf.placeholder(tf.float32, [None, self.cell_size, self.cell_size, 5 + self.num_class])
+            self.labels = tf.placeholder(tf.float32, [None, self.cell_size, self.cell_size, 5 + self.num_classes])
             self.loss_layer(self.logits, self.labels)
             self.total_loss = tf.contrib.losses.get_total_loss()
-            self.optimizer = tf.train.AdamOptimizer(settings.learning_rate).minimize(self.total_loss)
+            self.optimizer = tf.train.GradientDescentOptimizer(settings.learning_rate).minimize(self.total_loss)
         
     def build_network(self, images, num_outputs, alpha, keep_prob = settings.dropout, training = True, scope = 'yolo'):
         with tf.variable_scope(scope):
@@ -102,18 +105,18 @@ class Model:
 
     def loss_layer(self, predicts, labels, scope = 'loss_layer'):
         with tf.variable_scope(scope):
-            predict_classes = tf.reshape(predicts[:, :self.boundary1], [self.batch_size, self.cell_size, self.cell_size, self.num_class])
-            predict_scales = tf.reshape(predicts[:, self.boundary1:self.boundary2], [self.batch_size, self.cell_size, self.cell_size, self.boxes_per_cell])
-            predict_boxes = tf.reshape(predicts[:, self.boundary2:], [self.batch_size, self.cell_size, self.cell_size, self.boxes_per_cell, 4])
+            predict_classes = tf.reshape(predicts[:, :self.boundary1], [settings.batch_size, self.cell_size, self.cell_size, self.num_classes])
+            predict_scales = tf.reshape(predicts[:, self.boundary1:self.boundary2], [settings.batch_size, self.cell_size, self.cell_size, self.boxes_per_cell])
+            predict_boxes = tf.reshape(predicts[:, self.boundary2:], [settings.batch_size, self.cell_size, self.cell_size, self.boxes_per_cell, 4])
 
-            response = tf.reshape(labels[:, :, :, 0], [self.batch_size, self.cell_size, self.cell_size, 1])
-            boxes = tf.reshape(labels[:, :, :, 1:5], [self.batch_size, self.cell_size, self.cell_size, 1, 4])
+            response = tf.reshape(labels[:, :, :, 0], [settings.batch_size, self.cell_size, self.cell_size, 1])
+            boxes = tf.reshape(labels[:, :, :, 1:5], [settings.batch_size, self.cell_size, self.cell_size, 1, 4])
             boxes = tf.tile(boxes, [1, 1, 1, self.boxes_per_cell, 1]) / self.image_size
             classes = labels[:, :, :, 5:]
 
-            offset = tf.constant(self.offset, dtyp e= tf.float32)
+            offset = tf.constant(self.offset, dtype = tf.float32)
             offset = tf.reshape(offset, [1, self.cell_size, self.cell_size, self.boxes_per_cell])
-            offset = tf.tile(offset, [self.batch_size, 1, 1, 1])
+            offset = tf.tile(offset, [settings.batch_size, 1, 1, 1])
             predict_boxes_tran = tf.stack([(predict_boxes[:, :, :, :, 0] + offset) / self.cell_size,
                                            (predict_boxes[:, :, :, :, 1] + tf.transpose(offset, (0, 2, 1, 3))) / self.cell_size,
                                            tf.square(predict_boxes[:, :, :, :, 2]),
@@ -152,4 +155,7 @@ class Model:
             tf.contrib.losses.add_loss(coord_loss)
 
 def leaky_relu(alpha):
-    return tf.maximum(alpha * inputs, inputs)
+    
+    def op(inputs):
+        return tf.maximum(alpha * inputs, inputs)
+    return op
