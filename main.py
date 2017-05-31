@@ -45,8 +45,8 @@ def detect(img):
     inputs = cv2.cvtColor(inputs, cv2.COLOR_BGR2RGB).astype(np.float32)
     inputs = (inputs / 255.0) * 2.0 - 1.0
     inputs = np.reshape(inputs, (1, settings.image_size, settings.image_size, 3))
-
     result = detect_from_cvmat(inputs)[0]
+    print result
 
     for i in range(len(result)):
         result[i][1] *= (1.0 * img_w / settings.image_size)

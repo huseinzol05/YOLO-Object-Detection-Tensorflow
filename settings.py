@@ -3,6 +3,10 @@ classes_no = [i for i in xrange(len(classes_name))]
 classes_dict = dict(zip(classes_name, classes_no))
 num_class = len(classes_name)
 
+# got {normal, fast}
+# but if you change the type, u need to train first for atleast for few hours
+model_type = 'normal'
+
 image_size = 448
 cell_size = 7
 box_per_cell = 2

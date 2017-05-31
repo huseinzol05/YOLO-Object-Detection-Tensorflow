@@ -12,7 +12,7 @@ config.gpu_options.per_process_gpu_memory_fraction = settings.memory_duringtesti
 sess = tf.InteractiveSession(config = config)
 model = model.Model()
 utils = VOC('train')
-saver = tf.train.Saver(tf.global_variables(), max_to_keep = None)
+saver = tf.train.Saver(var_list = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope = 'yolo'))
 sess.run(tf.global_variables_initializer())
     
 try:
@@ -29,8 +29,6 @@ for i in xrange(settings.epoch):
         
     last_time = time.time()
     total_loss = 0
-    
-    print len(utils.gt_labels)
     
     for x in xrange(0, len(utils.gt_labels) - settings.batch_size, settings.batch_size):
         images = np.zeros((settings.batch_size, settings.image_size, settings.image_size, 3))
