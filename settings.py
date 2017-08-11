@@ -17,8 +17,8 @@ class_scale = 2.0
 coordinate_scale = 5.0
 flipped = True
 
-memory_duringtraining = 0.8
-memory_duringtesting = 0.8
+decay_step = 30000
+decay_rate = 0.1
 learning_rate = 0.0001
 dropout = 0.5
 batch_size = 3
