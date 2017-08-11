@@ -8,10 +8,7 @@ import matplotlib.pyplot as plt
 import tensorflow as tf
 import numpy as np
 
-config = tf.ConfigProto()
-config.gpu_options.allocator_type = 'BFC'
-config.gpu_options.per_process_gpu_memory_fraction = settings.memory_duringtesting
-sess = tf.InteractiveSession(config = config)
+sess = tf.InteractiveSession()
 model = model.Model(training = False)
 sess.run(tf.global_variables_initializer())
 saver = tf.train.Saver(tf.global_variables())
