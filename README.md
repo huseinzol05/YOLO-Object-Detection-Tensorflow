@@ -50,6 +50,14 @@ video_name = ''
 #### 3- You need to put YOLO_small.ckpt in the same folder (optional) if you want to use pretrained model, but if you train the model by your own, follow 3.*
 #### 3.1- You can train your own model from scratch in train-classification folder
 #### 3.2- Put your images that you want to classify in train-classification/data/
+```
+/
+/train-classification
+/train-classification/data/
+/train-classification/data/fish/
+/train-classification/data/cow/
+.. so on
+```
 #### 3.3- If you satisfied enough your model, copy model.ckpt into main folder
 #### 4- you must train.py in main directory first before main.py (unless if you downloaded YOLO_small.ckpt)
 #### 5- test in main
