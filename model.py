@@ -35,7 +35,7 @@ class Model:
             self.labels = tf.placeholder(tf.float32, [None, self.cell_size, self.cell_size, 5 + self.num_classes])
             self.loss_layer(self.logits, self.labels)
             self.total_loss = tf.contrib.losses.get_total_loss()
-            self.optimizer = tf.train.AdagradOptimizer(settings.learning_rate).minimize(self.total_loss)
+            self.optimizer = tf.train.GradientDescentOptimizer(settings.learning_rate).minimize(self.total_loss)
         
     def build_network(self, images, num_outputs, alpha, keep_prob = settings.dropout, training = True, scope = 'yolo'):
         with tf.variable_scope(scope):
