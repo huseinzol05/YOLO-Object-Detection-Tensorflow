@@ -6,10 +6,7 @@ import time
 import tensorflow as tf
 import numpy as np
 
-config = tf.ConfigProto()
-config.gpu_options.allocator_type = 'BFC'
-config.gpu_options.per_process_gpu_memory_fraction = settings.memory_duringtesting
-sess = tf.InteractiveSession(config = config)
+sess = tf.InteractiveSession()
 model = model.Model()
 utils = VOC('train')
 saver = tf.train.Saver(var_list = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope = 'yolo'))
@@ -23,7 +20,8 @@ except:
         saver.restore(sess, os.getcwd() + '/YOLO_small.ckpt')
         print 'load from YOLO small pretrained'
     except:
-        print 'start from fresh variables'
+        print 'exit, atleast need a pretrained model'
+        exit(0)
             
 for i in xrange(settings.epoch):
         
@@ -39,8 +37,9 @@ for i in xrange(settings.epoch):
             flipped = utils.gt_labels[x + n]['flipped']
             images[n, :, :, :] = utils.image_read(imname, flipped)
             labels[n, :, :, :] = utils.gt_labels[x + n]['label']
-            
-        loss, _ = sess.run([model.total_loss, model.optimizer], feed_dict = {model.images: images, model.labels: labels})
+        
+        learning_rate = tf.train.exponential_decay(settings.learning_rate, ((i + 1) * x), settings.decay_step, settings.decay_rate, True)
+        loss, _ = sess.run([model.total_loss, model.optimizer], feed_dict = {model.images: images, model.labels: labels, models.learning_rate: learning_rate})
         total_loss += loss
 
         if (x + 1) % settings.checkpoint == 0:
