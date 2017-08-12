@@ -4,6 +4,7 @@ from utils import VOC
 import os
 import time
 import tensorflow as tf
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import numpy as np
 
 sess = tf.InteractiveSession()
@@ -15,11 +16,14 @@ sess.run(tf.global_variables_initializer())
 try:
     saver.restore(sess, os.getcwd() + '/model.ckpt')
     print 'load from past checkpoint'
-except:     
+except Exception as e:
+    print e
     try:
+        print 'load yolo small'
         saver.restore(sess, os.getcwd() + '/YOLO_small.ckpt')
-        print 'load from YOLO small pretrained'
-    except:
+        print 'loaded from YOLO small pretrained'
+    except Exception as e:
+        print e
         print 'exit, atleast need a pretrained model'
         exit(0)
             
@@ -38,8 +42,7 @@ for i in xrange(settings.epoch):
             images[n, :, :, :] = utils.image_read(imname, flipped)
             labels[n, :, :, :] = utils.gt_labels[x + n]['label']
         
-        learning_rate = tf.train.exponential_decay(settings.learning_rate, ((i + 1) * x), settings.decay_step, settings.decay_rate, True)
-        loss, _ = sess.run([model.total_loss, model.optimizer], feed_dict = {model.images: images, model.labels: labels, models.learning_rate: learning_rate})
+        loss, _ = sess.run([model.total_loss, model.optimizer], feed_dict = {model.images: images, model.labels: labels})
         total_loss += loss
 
         if (x + 1) % settings.checkpoint == 0:

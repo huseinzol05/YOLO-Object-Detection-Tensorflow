@@ -62,7 +62,6 @@ for i in xrange(settings.epoch):
             emb_data_label[x, int(data[k + x, 1])] = 1.0
             emb_data[x, :, :, :] = image
             
-        learning_rate = tf.train.exponential_decay(settings.learning_rate, ((i + 1) * k), settings.decay_step, settings.decay_rate, True)
         _, loss = sess.run([model.optimizer, model.cost], feed_dict = {model.X : emb_data, model.Y : emb_data_label})
         accuracy = sess.run(model.accuracy, feed_dict = {model.X : emb_data, model.Y : emb_data_label})
         total_cost += loss

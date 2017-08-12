@@ -32,11 +32,12 @@ class Model:
             self.logits = self.build_fast_network(self.images, num_outputs = self.output_size, alpha = settings.alpha_relu, training = training)
         
         if training:
+            self.batch = tf.Variable(0)
             self.labels = tf.placeholder(tf.float32, [None, self.cell_size, self.cell_size, 5 + self.num_classes])
-            self.learning_rate = tf.placeholder(tf.float32)
             self.loss_layer(self.logits, self.labels)
             self.total_loss = tf.contrib.losses.get_total_loss()
-            self.optimizer = tf.train.GradientDescentOptimizer(self.learning_rate).minimize(self.total_loss)
+            self.learning_rate = tf.train.exponential_decay(settings.learning_rate, self.batch * settings.batch_size, settings.decay_step, settings.decay_rate, True)
+            self.optimizer = tf.train.GradientDescentOptimizer(self.learning_rate).minimize(self.total_loss, global_step = self.batch)
         
     def build_network(self, images, num_outputs, alpha, keep_prob = settings.dropout, training = True, scope = 'yolo'):
         with tf.variable_scope(scope):
