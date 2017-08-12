@@ -48,7 +48,7 @@ video_name = ''
 ```
 
 #### 2- You must download [VOC 2012](http://host.robots.ox.ac.uk/pascal/VOC/voc2012/VOCtrainval_11-May-2012.tar) and put in the same folder for multibox dataset
-#### 3- You need to put YOLO_small.ckpt in the same folder (optional) if you want to use pretrained model, but if you want to train the model by your own, follow 3.*
+#### 3- You need to put [YOLO_small.ckpt](https://drive.google.com/file/d/0B2JbaJSrWLpza08yS2FSUnV2dlE/view) in the same folder (optional) if you want to use pretrained model, but if you want to train the model by your own, follow 3.*
 #### 3.1- You can train your own model from scratch in train-classification folder
 #### 3.2- Put your images that you want to classify in train-classification/data/ (need to create it)
 ```
