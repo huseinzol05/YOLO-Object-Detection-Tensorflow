@@ -1,13 +1,20 @@
 # YOLO-Object-Detection-Tensorflow
-YOLO: Real-Time Object Detection using Tensorflow and easy to use
+YOLO: Real-Time Object Detection using Tensorflow and easy to use.
+
+## Information
+
+* I will get back soon for the issues, pretty busy.
+
+* I found it this YOLO not able to train.
+
+## Results
 
 ![alt text](output/000430.jpgoutput.png)
 ![alt text](output/000864.jpgoutput.png)
-![alt text](output/001432.jpgoutput.png)
-![alt text](output/003065.jpgoutput.png)
-![alt text](output/003785.jpgoutput.png)
 
-#### 1- Make sure check settings.py before start to train
+## Instructions
+
+1. Make sure check settings.py before start to train
 ```python
 # remove elements that you don't want
 # default objects from VOC 2012
@@ -47,10 +54,10 @@ picture_name = ''
 video_name = ''
 ```
 
-#### 2- You must download [VOC 2012](http://host.robots.ox.ac.uk/pascal/VOC/voc2012/VOCtrainval_11-May-2012.tar) and put in the same folder for multibox dataset
-#### 3- You need to put [YOLO_small.ckpt](https://drive.google.com/open?id=0BxQQlrLbdunWSTZjaHVwUVVOUXM) in the same folder (optional) if you want to use pretrained model, but if you want to train the model by your own, follow 3.*
-#### 3.1- You can train your own model from scratch in train-classification folder
-#### 3.2- Put your images that you want to classify in train-classification/data/ (need to create it)
+2. You must download [VOC 2012](http://host.robots.ox.ac.uk/pascal/VOC/voc2012/VOCtrainval_11-May-2012.tar) and put in the same folder for multibox dataset
+3. You need to put [YOLO_small.ckpt](https://drive.google.com/open?id=0BxQQlrLbdunWSTZjaHVwUVVOUXM) in the same folder (optional) if you want to use pretrained model, but if you want to train the model by your own, follow 3.*
+  1. You can train your own model from scratch in train-classification folder
+  2. Put your images that you want to classify in train-classification/data/ (need to create it)
 ```
 /
 /train-classification
@@ -63,12 +70,18 @@ video_name = ''
 ```bash
 python train.py
 ```
-#### 3.3- If you satisfied enough your model, copy model.ckpt into main folder
-#### 4- you must train.py in main directory first before main.py (unless if you downloaded YOLO_small.ckpt)
+  3. If you satisfied enough your model, copy model.ckpt into main folder
+4. you must train.py in main directory first before main.py (unless if you downloaded YOLO_small.ckpt)
 ```bash
 python train.py
 ```
-#### 5- test in main
+5. test in main
 ```bash
 python main.py
 ```
+
+## More results
+
+![alt text](output/001432.jpgoutput.png)
+![alt text](output/003065.jpgoutput.png)
+![alt text](output/003785.jpgoutput.png)
